@@ -59,7 +59,6 @@ dc_inet_org_persons:
 dc_sudoers:
   - cn: role_ldapUsers
     ou_dn: "ou=sudoers,{{ dc_distinguished_name }}"
-    attributes:
-      sudoHost: ALL
-      sudoUser: '%ldapUsers'
-      sudoCommand: ALL
+    sudoHost: ALL
+    sudoUser: '%ldapUsers'
+    sudoCommand: ALL
