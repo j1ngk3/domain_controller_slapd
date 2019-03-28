@@ -1,0 +1,17 @@
+---
+# tasks file for domain_controller_slapd
+- name: Install slapd
+  include_tasks: install_slapd.yml
+
+- name: Install Domain Certificates
+  include_tasks: install_certificates.yml
+
+- name: Set olcLogLevel
+  ldap_attr:
+    dn: "cn=config"
+    name: olcLogLevel
+    values: "{{ dc_olcLogLevel }}"
+    state: present
+
+- name: Configure Directory Structure
+  include_tasks: configure_directory_structure.yml

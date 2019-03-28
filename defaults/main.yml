@@ -1,0 +1,65 @@
+---
+# defaults file for domain_controller_slapd
+ryezone_labs_domain_suffix: local
+ryezone_labs_domain_organization: domain
+ryezone_labs_domain_admin_password: My$uper$ecretP@$$w0rd
+
+dc_org: "{{ ryezone_labs_domain_organization }}"
+dc_suffix: "{{ ryezone_labs_domain_suffix }}"
+dc_tld: "{{ dc_org }}.{{ dc_suffix }}"
+dc_hostname: "{{ ansible_hostname }}"
+dc_domain_admin_password: "{{ ryezone_labs_domain_admin_password }}"
+
+dc_olcLogLevel: stats
+
+dc_certificate_directory: /opt/ansible/certificates
+dc_tls_ca_certificate_file: "{{ dc_tld }}.crt"
+dc_tls_certificate_file: "{{ dc_tld }}.crt"
+dc_tls_key_file: "{{ dc_tld }}.pem"
+
+dc_purge_database: false
+dc_backend: MDB
+dc_no_configuration: false
+dc_policy_schema_needs_update: abort installation
+dc_dump_database: when needed
+dc_database_dump_directory: /var/backups/slapd-VERSION
+dc_invalid_config: true
+dc_move_old_database: true
+
+dc_organizational_units:
+  - name: users
+    domain_dn: "{{ dc_distinguished_name }}"
+  - name: groups
+    domain_dn: "{{ dc_distinguished_name }}"
+  - name: sudoers
+    domain_dn: "{{ dc_distinguished_name }}"
+
+dc_posix_groups:
+  - name: ldapUsers
+    ou_dn: "ou=groups,{{ dc_distinguished_name }}"
+    gid: 4000
+
+dc_posix_users:
+  - username: jdoe
+    ou_dn: "ou=users,{{ dc_distinguished_name }}"
+    surname: Doe
+    givenName: John
+    password: Password1
+    uid: 5000
+    gid: 4000
+    shell: /bin/bash
+
+dc_inet_org_persons:
+  - username: joeSchmoe
+    ou_dn: "ou=users,{{ dc_distinguished_name }}"
+    surname: Schmoe
+    givenName: Joe
+    password: '{SSHA}mm7AhcbWv7h8V8oZffzrRwdMFIiMZ9dF'
+
+dc_sudoers:
+  - cn: role_ldapUsers
+    ou_dn: "ou=sudoers,{{ dc_distinguished_name }}"
+    attributes:
+      sudoHost: ALL
+      sudoUser: '%ldapUsers'
+      sudoCommand: ALL

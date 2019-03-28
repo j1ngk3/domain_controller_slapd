@@ -1,0 +1,68 @@
+---
+# vars file for domain_controller_slapd
+dc_packages:
+  - ldap-utils
+  - slapd
+  - python-pip
+  - libldap2-dev
+  - python2.7-dev
+  - libsasl2-dev
+
+dc_default_admin_password: "Password1234%"
+
+dc_distinguished_name: "dc={{ dc_org }},dc={{ dc_suffix }}"
+dc_admin_distinguished_name: "cn=admin,{{ dc_distinguished_name }}"
+dc_domain_controller_uri: "{{ dc_hostname }}.{{ dc_tld }}"
+
+dc_slapd_debconf:
+  - question: slapd/internal/adminpw
+    value: "{{ dc_default_admin_password }}"
+    vtype: password
+  - question: slapd/password2
+    value: "{{ dc_default_admin_password }}"
+    vtype: password
+  - question: slapd/internal/generated_adminpw
+    value: "{{ dc_default_admin_password }}"
+    vtype: password
+  - question: slapd/password1
+    value: "{{ dc_default_admin_password }}"
+    vtype: password
+  - question: slapd/unsafe_selfwrite_acl
+    value: note
+    vtype: note
+  - question: slapd/purge_database
+    value: "{{ dc_purge_database }}"
+    vtype: boolean
+  - question: slapd/domain
+    value: "{{ dc_tld }}"
+    vtype: string
+  - question: shared/organization
+    value: "{{ dc_org }}"
+    vtype: string
+  - question: slapd/backend
+    value: "{{ dc_backend }}"
+    vtype: select
+  - question: slapd/no_configuration
+    value: "{{ dc_no_configuration }}"
+    vtype: boolean
+  - question: slapd/password_mismatch
+    value: note
+    vtype: note
+  - question: slapd/upgrade_slapcat_failure
+    value: error
+    vtype: error
+  - question: slapd/ppolicy_schema_needs_update
+    value: "{{ dc_policy_schema_needs_update }}"
+    vtype: select
+  - question: slapd/dump_database_destdir
+    value: "{{ dc_database_dump_directory }}"
+    vtype: string
+  - question: slapd/invalid_config
+    value: "{{ dc_invalid_config }}"
+    vtype: boolean
+  - question: slapd/dump_database
+    value: "{{ dc_dump_database }}"
+    vtype: select
+  - question: slapd/move_old_database
+    value: "{{ dc_move_old_database }}"
+    vtype: boolean
