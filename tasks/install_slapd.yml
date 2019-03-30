@@ -26,7 +26,6 @@
     passwd: "{{ dc_domain_admin_password }}"
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_default_admin_password }}"
-  become: yes
   when: install_slapd.changed
 
 - name: Install sudoRole schema
