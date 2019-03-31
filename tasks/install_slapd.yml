@@ -17,8 +17,8 @@
 
 - name: Install python-ldap
   pip:
-      name: python-ldap
-      state: present
+    name: python-ldap
+    state: present
 
 - name: Set password for LDAP Admin User.
   ldap_passwd:

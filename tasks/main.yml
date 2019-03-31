@@ -11,7 +11,8 @@
     dn: "cn=config"
     name: olcLogLevel
     values: "{{ dc_olcLogLevel }}"
-    state: present
+    state: exact
+  become: yes
 
 - name: Configure Directory Structure
   include_tasks: configure_directory_structure.yml

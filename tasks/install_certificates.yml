@@ -22,16 +22,14 @@
     - "{{ dc_tls_key_file }}"
   become: yes
 
-- name: configure TLS in directory
-  ldap_attr:
-    dn: cn=config
-    name: "{{ item.key }}"
-    values: "{{ item.value }}"
-    state: exact
-  with_dict:
-    olcTLSCACertificateFile: "/etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_ca_certificate_file }}"
-    olcTLSCertificateFile: "/etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_certificate_file }}"
-    olcTLSCertificateKeyFile: "/etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_key_file }}"
+- name: write ldiff files
+  template:
+    src: "enable_TLS.ldif.j2"
+    dest: "/etc/ldap/enable_TLS.ldif"
+  become: yes
+
+- name: enable TLS
+  shell: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f /etc/ldap/enable_TLS.ldif
   become: yes
 
 - name: Set olcSecurity
@@ -39,7 +37,7 @@
     dn: "olcDatabase={1}mdb,cn=config"
     name: olcSecurity
     values: "tls=1"
-    state: present
+    state: exact
   become: yes
 
 - name: Enable ldaps endpoint

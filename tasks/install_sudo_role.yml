@@ -1,4 +1,10 @@
 ---
+- name: Install python-ldap
+  pip:
+    name: python-ldap
+    state: present
+  become: yes
+
 - name: Install sudoRole schema
   ldap_entry:
     dn: cn=sudoRole,cn=schema,cn=config

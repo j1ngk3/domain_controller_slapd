@@ -1,0 +1,10 @@
+dn: cn=config
+changetype: modify
+replace: olcTLSCACertificateFile
+olcTLSCACertificateFile: /etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_ca_certificate_file }}
+-
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_certificate_file }}
+-
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_key_file }}
