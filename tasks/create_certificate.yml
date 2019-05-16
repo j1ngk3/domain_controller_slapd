@@ -1,7 +1,7 @@
 ---
 - name: Check for certificate.
   stat:
-    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
+    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
   register: stat_result
 
 - name: Install pip
@@ -29,7 +29,7 @@
 # and a passphrase
 - name: generate private key
   openssl_privatekey:
-    path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
+    path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
     size: 4096
     type: RSA
     owner: "{{ ansible_provision_user }}"
@@ -41,22 +41,22 @@
 # Generate an OpenSSL Certificate Signing Request with Subject information
 - name: generate csr
   openssl_csr:
-    path: "/opt/ansible/certificates/{{ top_level_domain }}.csr"
-    privatekey_path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
-    common_name: "*.{{ top_level_domain }}"
+    path: "/opt/ansible/certificates/{{ dc_tld }}.csr"
+    privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
+    common_name: "*.{{ dc_tld }}"
   when: not stat_result.stat.exists
 
 - name: Generate a Self Signed OpenSSL certificate
   openssl_certificate:
-    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
-    privatekey_path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
-    csr_path: "/opt/ansible/certificates/{{ top_level_domain }}.csr"
+    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
+    privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
+    csr_path: "/opt/ansible/certificates/{{ dc_tld }}.csr"
     provider: selfsigned
   when: not stat_result.stat.exists
 
 # Examples for some checks one could use the assertonly provider for:
 - name: Verify that the existing certificate is currently still valid
   openssl_certificate:
-    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
+    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
     provider: assertonly
     has_expired: False
