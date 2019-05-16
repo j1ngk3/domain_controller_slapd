@@ -1,0 +1,62 @@
+---
+- name: Check for certificate.
+  stat:
+    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
+  register: stat_result
+
+- name: Install pip
+  package:
+    name: python-pip
+    state: present
+  when: not stat_result.stat.exists
+
+- name: Ensure pyOpenSSL package is installed
+  command: "{{ ansible_python_interpreter | default('/usr/bin/python') }} -m pip install pyOpenSSL"
+  become: yes
+  when: not stat_result.stat.exists
+
+- name: create files directory
+  file:
+      path: "/opt/ansible/certificates"
+      state: directory
+      mode: 'u=rwx,g=rwx'
+      owner: "{{ ansible_provision_user }}"
+      group: "{{ ansible_provision_user }}"
+  when: not stat_result.stat.exists
+  become: yes
+
+# Generate an OpenSSL private key with the default values (4096 bits, RSA)
+# and a passphrase
+- name: generate private key
+  openssl_privatekey:
+    path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
+    size: 4096
+    type: RSA
+    owner: "{{ ansible_provision_user }}"
+    group: "{{ ansible_provision_user }}"
+    mode: 0644
+  become: yes
+  when: not stat_result.stat.exists
+
+# Generate an OpenSSL Certificate Signing Request with Subject information
+- name: generate csr
+  openssl_csr:
+    path: "/opt/ansible/certificates/{{ top_level_domain }}.csr"
+    privatekey_path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
+    common_name: "*.{{ top_level_domain }}"
+  when: not stat_result.stat.exists
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
+    privatekey_path: "/opt/ansible/certificates/{{ top_level_domain }}.pem"
+    csr_path: "/opt/ansible/certificates/{{ top_level_domain }}.csr"
+    provider: selfsigned
+  when: not stat_result.stat.exists
+
+# Examples for some checks one could use the assertonly provider for:
+- name: Verify that the existing certificate is currently still valid
+  openssl_certificate:
+    path: "/opt/ansible/certificates/{{ top_level_domain }}.crt"
+    provider: assertonly
+    has_expired: False

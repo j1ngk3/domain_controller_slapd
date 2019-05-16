@@ -8,3 +8,6 @@ olcTLSCertificateFile: /etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_certificate_file }
 -
 replace: olcTLSCertificateKeyFile
 olcTLSCertificateKeyFile: /etc/ldap/certs/{{ dc_tld }}/{{ dc_tls_key_file }}
+-
+replace: olcLogLevel
+olcLogLevel: {{ dc_olcLogLevel }}

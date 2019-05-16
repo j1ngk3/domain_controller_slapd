@@ -3,6 +3,10 @@
 - name: Install slapd
   include_tasks: install_slapd.yml
 
+- name: Create Domain Certificates
+  include_tasks: create_certificate.yml
+  when: build is true
+
 - name: Install Domain Certificates
   include_tasks: install_certificates.yml
 
