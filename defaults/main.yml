@@ -3,7 +3,9 @@
 ryezone_labs_domain_suffix: local
 ryezone_labs_domain_organization: domain
 ryezone_labs_domain_admin_password: My$uper$ecretP@$$w0rd
+ryezone_labs_provision_user: vagrant
 
+ansible_provision_user: "{{ ryezone_labs_provision_user }}"
 dc_org: "{{ ryezone_labs_domain_organization }}"
 dc_suffix: "{{ ryezone_labs_domain_suffix }}"
 dc_tld: "{{ dc_org }}.{{ dc_suffix }}"
