@@ -5,7 +5,7 @@
     objectClass: organizationalUnit
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps://{{ dc_domain_controller_uri }}"
+    server_uri: "ldaps:///"
   loop: "{{ dc_organizational_units }}"
 
 - name: Create POSIX Groups
@@ -14,7 +14,7 @@
     objectClass: posixGroup
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps://{{ dc_domain_controller_uri }}"
+    server_uri: "ldaps:///"
     attributes:
       gidNumber: "{{ item.gid }}"
   loop: "{{ dc_posix_groups }}"
@@ -28,7 +28,7 @@
       - shadowAccount
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps://{{ dc_domain_controller_uri }}"
+    server_uri: "ldaps:///"
     attributes:
       uid: "{{ item.username }}"
       sn: "{{ item.surname }}"
@@ -47,7 +47,7 @@
     objectClass: inetOrgPerson
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps://{{ dc_domain_controller_uri }}"
+    server_uri: "ldaps:///"
     attributes:
       sn: "{{ item.surname }}"
       givenName: "{{ item.givenName }}"
@@ -63,7 +63,7 @@
       - sudoRole
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps://{{ dc_domain_controller_uri }}"
+    server_uri: "ldaps:///"
     attributes:
       cn: "{{ item.cn }}"
       sudoHost: "{{ item.sudoHost }}"
