@@ -61,7 +61,6 @@
     provider: assertonly
     has_expired: False
 
----
 # tasks file for trusted_certificates
 - name: copy ldap certificate to trusted certs folder
   copy:
