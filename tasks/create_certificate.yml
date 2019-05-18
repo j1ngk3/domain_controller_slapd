@@ -44,7 +44,7 @@
     path: "/opt/ansible/certificates/{{ dc_tld }}.csr"
     privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
     common_name: "*.{{ dc_tld }}"
-    subject_alt_name: "DNS:*.{{ dc_tld }},DNS:{{ dc_hostname }}.{{ dc_tld }},DNS:{{ dc_hostname }},DNS:localhost"
+    subject_alt_name: "DNS:*.{{ dc_tld }},DNS:{{ dc_hostname }},DNS:localhost"
   when: not stat_result.stat.exists
 
 - name: Generate a Self Signed OpenSSL certificate
