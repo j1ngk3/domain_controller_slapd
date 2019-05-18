@@ -60,3 +60,18 @@
     path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
     provider: assertonly
     has_expired: False
+
+---
+# tasks file for trusted_certificates
+- name: copy ldap certificate to trusted certs folder
+  copy:
+    src: "/opt/ansible/certificates/{{ dc_tld }}.crt"
+    dest: "/usr/local/share/ca-certificates/{{ dc_tld }}.crt"
+    mode: 0644
+  register: result
+  become: yes
+
+- name: Update cert index
+  command: /usr/sbin/update-ca-certificates
+  when: result is changed
+  become: yes
