@@ -10,9 +10,10 @@
     state: present
 
 - name: Ensure pyOpenSSL package is installed
-  command: "{{ ansible_python_interpreter | default('/usr/bin/python') }} -m pip install pyOpenSSL"
+  pip:
+      name: pyOpenSSL
+      state: present
   become: yes
-  when: not stat_result.stat.exists
 
 - name: create files directory
   file:
