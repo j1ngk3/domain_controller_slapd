@@ -15,9 +15,9 @@ dc_domain_admin_password: "{{ ryezone_labs_domain_admin_password }}"
 dc_olcLogLevel: stats
 
 dc_certificate_directory: /opt/ansible/certificates
-dc_tls_ca_certificate_file: "{{ dc_tld }}.crt"
+dc_tls_ca_certificate_file: "ca.crt"
 dc_tls_certificate_file: "{{ dc_tld }}.crt"
-dc_tls_key_file: "{{ dc_tld }}.pem"
+dc_tls_key_file: "{{ dc_tld }}.key"
 
 dc_purge_database: false
 dc_backend: MDB

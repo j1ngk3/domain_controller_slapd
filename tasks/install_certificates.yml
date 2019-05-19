@@ -14,11 +14,18 @@
 
 - name: copy ldap certificate to ldap certs folder
   copy:
-    src: "{{ dc_certificate_directory }}/{{ item }}"
+    src: "{{ dc_certificate_directory }}/public/{{ item }}"
     dest: "/etc/ldap/certs/{{ dc_tld }}/{{ item }}"
   loop:
     - "{{ dc_tls_ca_certificate_file }}"
     - "{{ dc_tls_certificate_file }}"
+  become: yes
+
+- name: copy ldap certificate keys to ldap certs folder
+  copy:
+    src: "{{ dc_certificate_directory }}/private/{{ item }}"
+    dest: "/etc/ldap/certs/{{ dc_tld }}/{{ item }}"
+  loop:
     - "{{ dc_tls_key_file }}"
   become: yes
 

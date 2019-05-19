@@ -1,7 +1,7 @@
 ---
 - name: Check for certificate.
   stat:
-    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
+    path: "/opt/ansible/certificates/public/{{ dc_tld }}.crt"
   register: stat_result
 
 - name: Install pip
@@ -17,19 +17,22 @@
 
 - name: create files directory
   file:
-      path: "/opt/ansible/certificates"
+      path: "{{ item }}"
       state: directory
       mode: 'u=rwx,g=rwx'
       owner: "{{ ansible_provision_user }}"
       group: "{{ ansible_provision_user }}"
   when: not stat_result.stat.exists
   become: yes
+  loop:
+    - "/opt/ansible/certificates/public"
+    - "/opt/ansible/certificates/private"
 
 # Generate an OpenSSL private key with the default values (4096 bits, RSA)
 # and a passphrase
 - name: generate private key
   openssl_privatekey:
-    path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
+    path: "/opt/ansible/certificates/private/{{ dc_tld }}.key"
     size: 4096
     type: RSA
     owner: "{{ ansible_provision_user }}"
@@ -41,32 +44,32 @@
 # Generate an OpenSSL Certificate Signing Request with Subject information
 - name: generate csr
   openssl_csr:
-    path: "/opt/ansible/certificates/{{ dc_tld }}.csr"
-    privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
+    path: "/opt/ansible/certificates/private/{{ dc_tld }}.csr"
+    privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.key"
     common_name: "*.{{ dc_tld }}"
     subject_alt_name: "DNS:*.{{ dc_tld }},DNS:localhost"
   when: not stat_result.stat.exists
 
 - name: Generate a Self Signed OpenSSL certificate
   openssl_certificate:
-    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
-    privatekey_path: "/opt/ansible/certificates/{{ dc_tld }}.pem"
-    csr_path: "/opt/ansible/certificates/{{ dc_tld }}.csr"
+    path: "/opt/ansible/certificates/public/{{ dc_tld }}.crt"
+    privatekey_path: "/opt/ansible/certificates/private/{{ dc_tld }}.key"
+    csr_path: "/opt/ansible/certificates/private/{{ dc_tld }}.csr"
     provider: selfsigned
   when: not stat_result.stat.exists
 
 # Examples for some checks one could use the assertonly provider for:
 - name: Verify that the existing certificate is currently still valid
   openssl_certificate:
-    path: "/opt/ansible/certificates/{{ dc_tld }}.crt"
+    path: "/opt/ansible/certificates/public/{{ dc_tld }}.crt"
     provider: assertonly
     has_expired: False
 
 # tasks file for trusted_certificates
 - name: copy ldap certificate to trusted certs folder
   copy:
-    src: "/opt/ansible/certificates/{{ dc_tld }}.crt"
-    dest: "/usr/local/share/ca-certificates/{{ dc_tld }}.crt"
+    src: "/opt/ansible/certificates/public/{{ dc_tld }}.crt"
+    dest: "/usr/local/share/ca-certificates/public/{{ dc_tld }}.crt"
     mode: 0644
   register: result
   become: yes
