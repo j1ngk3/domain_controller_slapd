@@ -4,16 +4,10 @@
     path: "/opt/ansible/certificates/public/{{ dc_tld }}.crt"
   register: stat_result
 
-- name: Install pip
-  package:
-    name: python-pip
-    state: present
-
 - name: Ensure pyOpenSSL package is installed
   pip:
       name: pyOpenSSL
       state: present
-  become: yes
 
 - name: create files directory
   file:
@@ -23,7 +17,6 @@
       owner: "{{ ansible_provision_user }}"
       group: "{{ ansible_provision_user }}"
   when: not stat_result.stat.exists
-  become: yes
   loop:
     - "/opt/ansible/certificates/public"
     - "/opt/ansible/certificates/private"
@@ -38,7 +31,6 @@
     owner: "{{ ansible_provision_user }}"
     group: "{{ ansible_provision_user }}"
     mode: 0644
-  become: yes
   when: not stat_result.stat.exists
 
 # Generate an OpenSSL Certificate Signing Request with Subject information
@@ -72,9 +64,7 @@
     dest: "/usr/local/share/ca-certificates/public/{{ dc_tld }}.crt"
     mode: 0644
   register: result
-  become: yes
 
 - name: Update cert index
   command: /usr/sbin/update-ca-certificates
   when: result is changed
-  become: yes
