@@ -1,0 +1,30 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    role-file: roles/requirements.yml
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+  flake8
+platforms:
+  - name: ubuntu18-${BUILD_TAG:-test}
+    image: "geerlingguy/docker-ubuntu1804-ansible:latest"
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+      - "nfs:/mnt/nfs/home"
+    env:
+      http_proxy: "${http_proxy}"
+      https_proxy: "${https_proxy}"
+      no_proxy: "${no_proxy}"
+provisioner:
+  name: ansible
+verifier:
+  name: testinfra
+  options:
+    v: 1

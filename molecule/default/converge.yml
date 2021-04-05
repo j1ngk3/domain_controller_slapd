@@ -1,0 +1,6 @@
+---
+- name: Ansible Common
+  hosts: all
+  become: yes
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
