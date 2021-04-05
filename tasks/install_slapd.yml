@@ -1,4 +1,7 @@
 ---
+- name: Check if slapd service present
+  service_facts:
+
 - name: Answer slapd install questions
   debconf:
     name: slapd
@@ -6,20 +9,23 @@
     value: "{{ item.value }}"
     vtype: "{{ item.vtype }}"
   loop: "{{ dc_slapd_debconf }}"
-  become: yes
+  when: "'slapd' not in ansible_facts.services"
 
 - name: Install slapd packages
   apt:
     name: "{{ dc_packages }}"
     state: present
     update_cache: yes
-  become: yes
-  register: install_slapd
 
 - name: Install python-ldap
   pip:
     name: python-ldap
     state: present
+
+- name: Ensure slapd is started
+  service:
+    name: slapd
+    state: started
 
 - name: Set password for LDAP Admin User.
   ldap_passwd:
@@ -27,8 +33,3 @@
     passwd: "{{ dc_domain_admin_password }}"
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_default_admin_password }}"
-  when: install_slapd.changed
-
-- name: Install sudoRole schema
-  include_tasks: install_sudo_role.yml
-  when: install_slapd.changed
