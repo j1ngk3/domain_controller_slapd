@@ -1,16 +1,8 @@
 ---
-- name: Install python-ldap
-  pip:
-      name: python-ldap
-      state: present
-  become: yes
-
 - name: create /etc/ldap/certs directory
   file:
     path: "/etc/ldap/certs/{{ dc_tld }}"
     state: directory
-    mode: "u=rwx,g=rx"
-  become: yes
 
 - name: copy ldap certificate to ldap certs folder
   copy:
@@ -19,7 +11,6 @@
   loop:
     - "{{ dc_tls_ca_certificate_file }}"
     - "{{ dc_tls_certificate_file }}"
-  become: yes
 
 - name: copy ldap certificate keys to ldap certs folder
   copy:
@@ -27,17 +18,14 @@
     dest: "/etc/ldap/certs/{{ dc_tld }}/{{ item }}"
   loop:
     - "{{ dc_tls_key_file }}"
-  become: yes
 
 - name: write ldiff files
   template:
     src: "enable_TLS.ldif.j2"
     dest: "/etc/ldap/enable_TLS.ldif"
-  become: yes
 
-- name: enable TLS
-  shell: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f /etc/ldap/enable_TLS.ldif
-  become: yes
+# - name: enable TLS
+  # shell: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f /etc/ldap/enable_TLS.ldif
 
 - name: Set olcSecurity
   ldap_attr:
@@ -45,7 +33,6 @@
     name: olcSecurity
     values: "tls=1"
     state: exact
-  become: yes
 
 - name: Enable ldaps endpoint
   lineinfile:
@@ -53,12 +40,5 @@
     state: present
     regex: ^SLAPD_SERVICES=*
     line: 'SLAPD_SERVICES="ldap:/// ldapi:/// ldaps:///"'
-  register: endpoint_status
-  become: yes
-
-- name: Restart slapd
-  service:
-    name: slapd
-    state: restarted
-  when: endpoint_status.changed
-  become: yes
+  notify:
+    - "restart slapd"
