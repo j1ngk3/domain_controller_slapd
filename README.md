@@ -1,4 +1,4 @@
-ryezone_labs.domain_controller_slapd
+domain_controller_slapd
 =========
 
 This role installs and configures slapd on Ubuntu.
@@ -10,51 +10,29 @@ This role installs and configures slapd on Ubuntu.
 Requirements
 ------------
 
-- This role does not generate SSL certificates, these must be pre-generated.
+- Python pip should be installed.
 
 Role Variables
 --------------
-
-### Global Variables
-
-- `ryezone_labs_domain_suffix` (string)
-
-   Domain suffix to use when creating the domain.
-   
-   Defaults to `local`.
-
-- `ryezone_labs_domain_organization` (string)
-
-   Organization name to use when creating the domain.
-   
-   Defaults to `domain`.
-
-- `ryezone_labs_domain_admin_password` (string)
-
-   Password to use for the default admin account `cn=admin,dc={{ dc_org }},dc={{ dc_suffix }}`.
-   
-   Defaults to `My$uper$ecretP@$$w0rd`.
-
-### Role Variables
 
 - `dc_org` (string)
 
    Organization name to use when creating the domain.
    Sets the value of the `shared/organization` debconf question of the slapd install.
    
-   Defaults to `{{ ryezone_labs_domain_organization }}`.
+   Defaults to `domain`.
 
 - `dc_suffix` (string)
 
    Domain suffix to use when creating the domain.
    
-   Defaults to `{{ ryezone_labs_domain_suffix }}`.
+   Defaults to `local`.
 
 - `dc_domain_admin_password` (string)
 
-   Password to use for the default admin account `{{ dc_admin_distinguished_name }}`.
+   Password to use for the default admin account `cn=admin,dc={{ dc_org }},dc={{ dc_suffix }}`.
 
-   Defaults to `{{ ryezone_labs_domain_admin_password }}`
+   Defaults to `My$uper$ecretP@$$w0rd`
 
 - `dc_olcLogLevel` (string)
 
@@ -62,7 +40,7 @@ Role Variables
 
    Defaults to `stats`
 
-### Role Variables - TLS configuration
+### Role Variables - TLS configuration TODO
 
 - `dc_certificate_directory` (string)
 
@@ -110,8 +88,6 @@ Role Variables
      - name: users
        domain_dn: "{{ dc_distinguished_name }}"
      - name: groups
-       domain_dn: "{{ dc_distinguished_name }}"
-     - name: sudoers
        domain_dn: "{{ dc_distinguished_name }}"
    ```
 
@@ -242,44 +218,13 @@ Role Variables
        password: '{SSHA}mm7AhcbWv7h8V8oZffzrRwdMFIiMZ9dF'
    ```
 
-### Role Variables - Sudoers
+This can be left blank via:
 
-- `dc_sudoers` (list of hashes)
+```yaml
+dc_inet_org_persons: []
+```
 
-   This list defines who is granted sudo access on the domain.
-
-   - `cn` (string)
-
-      This is the common name of the sudoRole.
-
-   - `ou_dn` (string)
-
-      This is the distinguished name of the organizational unit under which the sudoRole entry should be created.
-      A helper variable, `dc_distinguished_name`, is provided to reduce code duplication.
-
-   - `sudoHost` (string)
-
-      This is the set of hosts on which the user is authorized to use sudo privileges.
-
-   - `sudoUser` (string)
-
-      This is the user allowed to use sudo.
-
-   - `sudoCommand` (string)
-
-      This is the set of commands the user is authorized to perform.
-
-   This defaults to:
-   
-   ```yaml
-   dc_sudoers:
-     - cn: role_ldapUsers
-       ou_dn: "ou=sudoers,{{ dc_distinguished_name }}"
-       attributes:
-         sudoHost: ALL
-         sudoUser: '%ldapUsers'
-         sudoCommand: ALL
-   ```
+if unneeded.
 
 ### Role Variables - Helper Variables
 
