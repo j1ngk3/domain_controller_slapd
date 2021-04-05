@@ -5,7 +5,7 @@
     objectClass: organizationalUnit
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps:///"
+    server_uri: "{{ ldap_server_uri }}:///"
   loop: "{{ dc_organizational_units }}"
 
 - name: Create POSIX Groups
@@ -14,7 +14,7 @@
     objectClass: posixGroup
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps:///"
+    server_uri: "{{ ldap_server_uri }}:///"
     attributes:
       gidNumber: "{{ item.gid }}"
   loop: "{{ dc_posix_groups }}"
@@ -28,7 +28,7 @@
       - shadowAccount
     bind_dn: "{{ dc_admin_distinguished_name }}"
     bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps:///"
+    server_uri: "{{ ldap_server_uri }}:///"
     attributes:
       uid: "{{ item.username }}"
       sn: "{{ item.surname }}"
@@ -38,35 +38,21 @@
       gidNumber: "{{ item.gid }}"
       userPassword: "{{ item.password }}"
       loginShell: "{{ item.shell }}"
-      homeDirectory: "/home/{{ item.username }}"
+      homeDirectory: "{{ dc_user_homeDir_base }}{{ item.username }}"
   loop: "{{ dc_posix_users }}"
 
-- name: Create InetOrgPerson Users
-  ldap_entry:
-    dn: "cn={{ item.username }},{{ item.ou_dn }}"
-    objectClass: inetOrgPerson
-    bind_dn: "{{ dc_admin_distinguished_name }}"
-    bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps:///"
-    attributes:
-      sn: "{{ item.surname }}"
-      givenName: "{{ item.givenName }}"
-      cn: "{{ item.username }}"
-      userPassword: "{{ item.password }}"
-  loop: "{{ dc_inet_org_persons }}"
-
-- name: Create Sudoers
-  ldap_entry:
-    dn: "cn={{ item.cn }},{{ item.ou_dn }}"
-    objectClass:
-      - top
-      - sudoRole
-    bind_dn: "{{ dc_admin_distinguished_name }}"
-    bind_pw: "{{ dc_domain_admin_password }}"
-    server_uri: "ldaps:///"
-    attributes:
-      cn: "{{ item.cn }}"
-      sudoHost: "{{ item.sudoHost }}"
-      sudoUser: "{{ item.sudoUser }}"
-      sudoCommand: "{{ item.sudoCommand }}"
-  loop: "{{ dc_sudoers }}"
+- when: dc_inet_org_persons | length > 0
+  block:
+    - name: Create InetOrgPerson Users
+      ldap_entry:
+        dn: "cn={{ item.username }},{{ item.ou_dn }}"
+        objectClass: inetOrgPerson
+        bind_dn: "{{ dc_admin_distinguished_name }}"
+        bind_pw: "{{ dc_domain_admin_password }}"
+        server_uri: "{{ ldap_server_uri }}:///"
+        attributes:
+          sn: "{{ item.surname }}"
+          givenName: "{{ item.givenName }}"
+          cn: "{{ item.username }}"
+          userPassword: "{{ item.password }}"
+      loop: "{{ dc_inet_org_persons }}"
