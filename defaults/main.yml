@@ -1,16 +1,12 @@
 ---
 # defaults file for domain_controller_slapd
-ryezone_labs_domain_suffix: local
-ryezone_labs_domain_organization: domain
-ryezone_labs_domain_admin_password: My$uper$ecretP@$$w0rd
-ryezone_labs_provision_user: vagrant
+ldap_server_uri: "ldap"
 
-ansible_provision_user: "{{ ryezone_labs_provision_user }}"
-dc_org: "{{ ryezone_labs_domain_organization }}"
-dc_suffix: "{{ ryezone_labs_domain_suffix }}"
+dc_org: domain
+dc_suffix: local
 dc_tld: "{{ dc_org }}.{{ dc_suffix }}"
 dc_hostname: "{{ ansible_hostname }}"
-dc_domain_admin_password: "{{ ryezone_labs_domain_admin_password }}"
+dc_domain_admin_password: My$uper$ecretP@$$w0rd
 
 dc_olcLogLevel: stats
 
@@ -33,14 +29,13 @@ dc_organizational_units:
     domain_dn: "{{ dc_distinguished_name }}"
   - name: groups
     domain_dn: "{{ dc_distinguished_name }}"
-  - name: sudoers
-    domain_dn: "{{ dc_distinguished_name }}"
 
 dc_posix_groups:
   - name: ldapUsers
     ou_dn: "ou=groups,{{ dc_distinguished_name }}"
     gid: 4000
 
+dc_user_homeDir_base: "/home/"
 dc_posix_users:
   - username: jdoe
     ou_dn: "ou=users,{{ dc_distinguished_name }}"
@@ -57,10 +52,3 @@ dc_inet_org_persons:
     surname: Schmoe
     givenName: Joe
     password: '{SSHA}mm7AhcbWv7h8V8oZffzrRwdMFIiMZ9dF'
-
-dc_sudoers:
-  - cn: role_ldapUsers
-    ou_dn: "ou=sudoers,{{ dc_distinguished_name }}"
-    sudoHost: ALL
-    sudoUser: '%ldapUsers'
-    sudoCommand: ALL
