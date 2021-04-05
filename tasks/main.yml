@@ -5,10 +5,11 @@
 
 - name: Create Domain Certificates
   include_tasks: create_certificate.yml
-  when: build
+  when: ldap_server_uri == "ldaps"
 
 - name: Install Domain Certificates
   include_tasks: install_certificates.yml
+  when: ldap_server_uri == "ldaps"
 
 - name: Configure Directory Structure
   include_tasks: configure_directory_structure.yml
