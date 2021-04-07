@@ -38,7 +38,7 @@
       gidNumber: "{{ item.gid }}"
       userPassword: "{{ item.password }}"
       loginShell: "{{ item.shell }}"
-      homeDirectory: "{{ dc_user_homeDir_base }}{{ item.username }}"
+      homeDirectory: "{{ dc_user_homeDir_base }}/{{ item.username }}"
   loop: "{{ dc_posix_users }}"
 
 - when: dc_inet_org_persons | length > 0
